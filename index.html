@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ақуыздың денатурациясы сабағы</title>
+    <!-- Tailwind CSS-ті қосу -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Inter шрифтін негізгі шрифт ретінде орнату */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        /* Сынауық стилі */
+        .test-tube {
+            width: 80px;
+            height: 250px;
+            border: 4px solid #4a5568; /* Қою сұр шекара */
+            border-top: none; 
+            border-bottom-left-radius: 40px; 
+            border-bottom-right-radius: 40px;
+            background-color: #f0f4f8; /* Ашық фон */
+            position: relative;
+            overflow: hidden; 
+            margin: 0 20px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Жұмсақ көлеңке */
+        }
+
+        /* Сынауықтың ішіндегі сұйықтық */
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0; 
+            background-color: #FDE047; /* Сарғыш (жұмыртқа ақуызы) */
+            transition: height 1.5s ease-out, background-color 0.8s ease; 
+        }
+        
+        /* Сұйықтықтың "толтырылған" күйі */
+        .liquid.filled {
+            height: 120px; 
+        }
+
+        /* Тұнба стилі */
+        .precipitate {
+            position: absolute;
+            bottom: 5px; 
+            left: 5px;
+            right: 5px;
+            height: 0; 
+            opacity: 0; 
+            border-radius: 20px; 
+            background-color: transparent;
+            transition: height 1s ease-in, opacity 0.8s ease-in; /* Жаңа тұнба пайда болу анимациясы */
+        }
+        
+        /* Тұнбаның "түзілген" күйі */
+        .precipitate.formed {
+            height: 70px; 
+            opacity: 1; 
+        }
+
+        /* 1-ші сынауықтағы көк тұнба (мыс протеинаты) */
+        #precipitate-1 {
+            background-color: #4C84C4; /* Орташа көк */
+        }
+
+        /* 2-ші сынауықтағы ақ тұнба (қорғасын протеинаты) */
+        #precipitate-2 {
+            background-color: #F0F0F0; /* Ақшыл сұр */
+        }
+        
+        /* Тамып жатқан тамшы стилі */
+        .drop {
+            position: absolute;
+            top: -40px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* 1-ші тамшы (мыс сульфаты) */
+        #drop-1 { background-color: #2563EB; } 
+        /* 2-ші тамшы (қорғасын ацетаты) */
+        #drop-2 { background-color: #A9A9A9; } /* Қоюлау сұр */
+        
+        /* Тамшының таму анимациясы */
+        .dropping {
+            animation: drop-animation 1s ease-in forwards;
+        }
+
+        @keyframes drop-animation {
+            0% {
+                top: -40px;
+                opacity: 1;
+            }
+            100% {
+                top: 100px; /* Сұйықтықтың бетіне дейін */
+                opacity: 0;
+            }
+        }
+
+        /* Түйме стиліне градиент қосу */
+        #start-btn {
+            background-image: linear-gradient(to right, #3B82F6 0%, #1D4ED8 100%);
+            border: none;
+        }
+        #start-btn:hover:not(:disabled) {
+            background-image: linear-gradient(to right, #1D4ED8 0%, #3B82F6 100%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+
+    <div class="container max-w-4xl mx-auto p-8 bg-white shadow-2xl rounded-xl">
+        
+        <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-8 border-b pb-3">
+            Ақуыздың ауыр металл тұздарымен денатурациясы (Тәжірибе)
+        </h1>
+
+        <!-- Анимация алаңы -->
+        <div class="flex justify-center items-end h-80 my-10">
+            
+            <!-- 1-ші сынауық: Ақуыз + Мыс сульфаты -->
+            <div class="flex flex-col items-center">
+                <span class="font-semibold mb-3 text-gray-700">1. Ақуыз + CuSO₄</span>
+                <div class="test-tube">
+                    <div class="drop" id="drop-1"></div>
+                    <div class="liquid" id="liquid-1"></div>
+                    <div class="precipitate" id="precipitate-1"></div>
+                </div>
+            </div>
+
+            <!-- 2-ші сынауық: Ақуыз + Қорғасын ацетаты -->
+            <div class="flex flex-col items-center">
+                <span class="font-semibold mb-3 text-gray-700">2. Ақуыз + Pb(CH₃COO)₂</span>
+                <div class="test-tube">
+                    <div class="drop" id="drop-2"></div>
+                    <div class="liquid" id="liquid-2"></div>
+                    <div class="precipitate" id="precipitate-2"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Түсініктеме алаңы -->
+        <div class="text-center p-6 bg-blue-50 border border-blue-200 rounded-lg min-h-[120px] flex items-center justify-center">
+            <p id="explanation" class="text-lg text-gray-800 font-medium">
+                Тәжірибені бастау үшін "Бастау" түймесін басыңыз.
+            </p>
+        </div>
+
+        <!-- Басқару түймелері -->
+        <div class="flex justify-center gap-6 mt-8">
+            <button id="start-btn" class="px-8 py-3 text-white font-bold rounded-full shadow-lg transition duration-300 disabled:opacity-50 hover:shadow-xl">
+                Бастау
+            </button>
+            <button id="reset-btn" class="px-8 py-3 bg-gray-300 text-gray-800 font-bold rounded-full shadow-lg hover:bg-gray-400 transition duration-300" disabled>
+                Қайта бастау
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Элементтерді анықтау
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const explanation = document.getElementById('explanation');
+        
+        const liquid1 = document.getElementById('liquid-1');
+        const liquid2 = document.getElementById('liquid-2');
+        
+        const precipitate1 = document.getElementById('precipitate-1');
+        const precipitate2 = document.getElementById('precipitate-2');
+        
+        const drop1 = document.getElementById('drop-1');
+        const drop2 = document.getElementById('drop-2');
+
+        let currentStep = 0; // Ағымдағы қадам
+        
+        // "Бастау / Келесі" түймесін басқанда
+        startBtn.addEventListener('click', () => {
+            currentStep++; 
+            runAnimationStep(currentStep); 
+        });
+
+        // "Қайта бастау" түймесін басқанда
+        resetBtn.addEventListener('click', resetAnimation);
+
+        // Анимация қадамдарын орындау функциясы
+        function runAnimationStep(step) {
+            startBtn.disabled = true; // Қадам орындалғанша түймені өшіру
+
+            switch (step) {
+                // 1-ҚАДАМ: Ақуызды құю
+                case 1:
+                    explanation.innerHTML = "<b>1-қадам:</b> Екі сынауыққа да 1 мл-ден жұмыртқа ақуызының (альбумин) ерітіндісін құямыз. Бастапқы ерітінді – сарғыш, мөлдір сұйықтық.";
+                    liquid1.classList.add('filled');
+                    liquid2.classList.add('filled');
+                    resetBtn.disabled = false;
+                    
+                    // Келесі қадамға өтуге рұқсат беру
+                    setTimeout(() => {
+                        startBtn.disabled = false;
+                        startBtn.textContent = 'Келесі қадам';
+                    }, 1500); // 1.5 секундтан кейін
+                    break;
+
+                // 2-ҚАДАМ: Мыс сульфатын қосу (CuSO₄)
+                case 2:
+                    explanation.innerHTML = "<b>2-қадам:</b> 1-ші сынауыққа <b>мыс сульфатының (CuSO₄)</b> ерітіндісін тамызамыз. Мыс - ауыр металл.";
+                    drop1.classList.add('dropping'); // Тамшы анимациясы
+                    
+                    // Тамшы "түскеннен" кейін
+                    setTimeout(() => {
+                        // Сұйықтықтың түсін көкшілге өзгерту
+                        liquid1.style.backgroundColor = '#BFDBFE'; 
+                        // Тұнбаны көрсету
+                        precipitate1.classList.add('formed');
+                        explanation.innerHTML = "<b>Нәтиже (1-сынауық):</b> Мыс (II) иондары ақуызбен байланысып, <b>көк түсті</b> тұнба (мыс протеинаты) түзеді. Бұл денатурацияның қайтымсыз процесі.";
+                        drop1.classList.remove('dropping');
+                        startBtn.disabled = false;
+                    }, 1000); // 1 секундтан кейін
+                    break;
+
+                // 3-ҚАДАМ: Қорғасын ацетатын қосу (Pb(CH₃COO)₂)
+                case 3:
+                    explanation.innerHTML = "<b>3-қадам:</b> 2-ші сынауыққа <b>қорғасын ацетатының (Pb(CH₃COO)₂)</b> ерітіндісін тамызамыз. Қорғасын - ауыр металл.";
+                    drop2.classList.add('dropping'); // Тамшы анимациясы
+                    
+                    // Тамшы "түскеннен" кейін
+                    setTimeout(() => {
+                        // Сұйықтықтың түсі сәл ағарады (бұлттану)
+                        liquid2.style.backgroundColor = '#FDF6B5';
+                        // Ақ тұнбаны көрсету
+                        precipitate2.classList.add('formed');
+                        explanation.innerHTML = "<b>Нәтиже (2-сынауық):</b> Қорғасын иондары ақуызды тұнбаға түсіріп, <b>ақ түсті</b> тұнба (қорғасын протеинаты) түзіледі. Бұл да денатурация.";
+                        drop2.classList.remove('dropping');
+                        startBtn.disabled = false;
+                        startBtn.textContent = 'Қорытынды';
+                    }, 1000); // 1 секундтан кейін
+                    break;
+
+                // 4-ҚАДАМ: Қорытынды
+                case 4:
+                    explanation.innerHTML = "<h3>Жалпы қорытынды</h3><p>Ауыр металл тұздары (CuSO₄, Pb(CH₃COO)₂) ақуыздың молекуласымен байланысып, оның табиғи құрылымын (төртінші, үшінші және екінші реттік құрылымдарын) бұзады. Нәтижесінде ақуыз ерімейтін күйге (тұнбаға) айналады. Бұл процесс – <b>денатурация</b> – улы ауыр металдардың адам ағзасына қауіпті болуының негізгі себептерінің бірі.</p>";
+                    startBtn.textContent = 'Аяқталды';
+                    // "Бастау" түймесін толығымен өшіру, тек "Қайта бастау" қалды
+                    startBtn.disabled = true;
+                    break;
+            }
+        }
+
+        // Анимацияны бастапқы қалпына келтіру
+        function resetAnimation() {
+            currentStep = 0;
+            explanation.innerHTML = "Тәжірибені бастау үшін <b>'Бастау'</b> түймесін басыңыз.";
+            
+            // Сұйықтықтарды алып тастау
+            liquid1.classList.remove('filled');
+            liquid2.classList.remove('filled');
+            
+            // Тұнбаларды жасыру
+            precipitate1.classList.remove('formed');
+            precipitate2.classList.remove('formed');
+            
+            // Сұйықтықтардың бастапқы түсін қайтару
+            liquid1.style.backgroundColor = '#FDE047';
+            liquid2.style.backgroundColor = '#FDE047';
+
+            // Түймелерді бастапқы қалыпқа келтіру
+            startBtn.disabled = false;
+            startBtn.textContent = 'Бастау';
+            resetBtn.disabled = true;
+        }
+
+        // Бастапқы күйді орнату
+        document.addEventListener('DOMContentLoaded', resetAnimation);
+
+    </script>
+</body>
+</html>
